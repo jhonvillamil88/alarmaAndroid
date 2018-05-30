@@ -1,5 +1,6 @@
 package com.alarm.john.alarm;
 
+import android.icu.text.DateFormat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.AlertDialog;
@@ -10,15 +11,45 @@ import android.widget.TextView;
 import android.widget.Button;
 import 	android.os.SystemClock;
 import android.util.Log;
+import	java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import android.os.Vibrator;
+import android.content.Context;
+
 
 public class MainActivity extends AppCompatActivity {
 
     public boolean stateAlarma = false;
-    MonitorAlarma objMonitorAlarma = new MonitorAlarma();
+    public String  hours   = "00";
+    public String  minutes = "00";
+
+    private Vibrator vibrator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+
+        new Thread(new Runnable(){
+            public void run() {
+                // do something here
+                while(true){
+                    SystemClock.sleep(1000);
+                    if(!stateAlarma)continue;
+                    Log.d("run", "running alarm");
+
+                    if(comparetDate(TimePickerFragment.getHour()+":"+TimePickerFragment.getMinute())){
+                        Log.d("run","Se cumplio el alarma");
+
+                        vibrator.vibrate(1000000);
+                    }
+                }
+            }
+        }).start();
     }
 
     public void setTime (View v){
@@ -43,13 +74,21 @@ public class MainActivity extends AppCompatActivity {
 
         Button testButton = (Button) findViewById(R.id.setState);
         testButton.setText((stateAlarma)?"DESACTIVAR":"ACTIVAR");
-
-        if(stateAlarma){
-            objMonitorAlarma.doInBackground();
-        }
-
-
     }
 
+    public boolean comparetDate(String timeAlarm){
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
+        String currentDateandTime = format.format(new Date());
+        try{
+            Date dateAlarm = format.parse(timeAlarm);
+            Date dateSystem = format.parse(currentDateandTime);
+            if (dateSystem.getTime() > dateAlarm.getTime()) {
+                return true;
+            }
+        }catch(Exception e ){
+
+        }
+        return false;
+    }
 
 }
