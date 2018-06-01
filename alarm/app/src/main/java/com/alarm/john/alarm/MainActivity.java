@@ -9,6 +9,8 @@ import android.view.View;
 import android.support.v4.app.DialogFragment;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
 import 	android.os.SystemClock;
 import android.util.Log;
 import	java.text.SimpleDateFormat;
@@ -23,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean stateAlarma = false;
     public String  hours   = "00";
     public String  minutes = "00";
+    public int     day     = 0;
 
     private Vibrator vibrator;
 
@@ -46,10 +49,36 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("run","Se cumplio el alarma");
 
                         vibrator.vibrate(1000000);
+                        stateAlarma = false;
+                        resetAlarma();
+
+                       /* new AlertDialog.Builder(MainActivity.this)
+                                .setTitle("Alarma")
+                                .setMessage("Holaaa mi amor es hora de levantarte")
+                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+
+                                        dialog.cancel();
+                                    }
+                                }).show();*/
+
                     }
                 }
             }
         }).start();
+
+        /*RadioGroup radioGroup = this.findViewById(R.id.State);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // checkedId is the RadioButton selected
+                RadioButton rb=(RadioButton)findViewById(checkedId);
+                //textViewChoice.setText("You Selected " + rb.getText());
+                //Toast.makeText(getApplicationContext(), rb.getText(), Toast.LENGTH_SHORT).show();
+                Log.d("Test",rb.getText()+"");
+            }
+        });*/
+
     }
 
     public void setTime (View v){
@@ -77,6 +106,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean comparetDate(String timeAlarm){
+
+        RadioGroup radioGroup = this.findViewById(R.id.myRadioGroup);
+        int selectDay = radioGroup.getCheckedRadioButtonId()+1;
+        Log.d("Test","Day select "+selectDay);
+
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DAY_OF_WEEK);
+        Log.d("Day",day+"");
+        if(selectDay!=day)return false;
+
         SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         String currentDateandTime = format.format(new Date());
         try{
@@ -89,6 +128,16 @@ public class MainActivity extends AppCompatActivity {
 
         }
         return false;
+    }
+
+    public void setDay(View v){
+        Log.d("Test",v.toString());
+    }
+
+    public void resetAlarma(){
+        TextView stateText =this.findViewById(R.id.State);
+        stateText.setText("INACTIVO");
+        stateAlarma = false;
     }
 
 }

@@ -28,22 +28,21 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.416">
+        app:layout_constraintVertical_bias="0.416"
+        >
 
         <RadioButton
-            android:id="@+id/sound"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Lunes" />
+            android:text="Lunes"
+            />
 
         <RadioButton
-            android:id="@+id/vibration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Martes" />
 
         <RadioButton
-            android:id="@+id/silent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Miercoles" />
