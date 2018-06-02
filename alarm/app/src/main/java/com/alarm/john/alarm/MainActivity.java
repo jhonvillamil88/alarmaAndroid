@@ -1,12 +1,19 @@
 package com.alarm.john.alarm;
 
+import android.content.BroadcastReceiver;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.icu.text.DateFormat;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.view.KeyEvent;
 import android.view.View;
 import android.support.v4.app.DialogFragment;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.RadioGroup;
@@ -19,13 +26,14 @@ import java.util.Date;
 import android.os.Vibrator;
 import android.content.Context;
 
-
+import android.net.Uri;
 public class MainActivity extends AppCompatActivity {
 
     public boolean stateAlarma = false;
     public String  hours   = "00";
     public String  minutes = "00";
     public int     day     = 0;
+    public MainActivity el = this;
 
     private Vibrator vibrator;
 
@@ -34,9 +42,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        BroadcastReceiver mReceiver = new ReceiverScreen();
+        registerReceiver(mReceiver, filter);
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-
+        getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
         new Thread(new Runnable(){
             public void run() {
                 // do something here
@@ -45,12 +58,25 @@ public class MainActivity extends AppCompatActivity {
                     if(!stateAlarma)continue;
                     Log.d("run", "running alarm");
 
-                    if(comparetDate(TimePickerFragment.getHour()+":"+TimePickerFragment.getMinute())){
+                    hours = TimePickerFragment.getHour()+"";
+                    minutes = TimePickerFragment.getMinute()+"";
+
+                    if(comparetDate(hours+":"+minutes)){
                         Log.d("run","Se cumplio el alarma");
 
-                        vibrator.vibrate(1000000);
+                        Log.v("", "Initializing sounds...");
+
+
+
+                        MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.alarma);
+                        ring.setLooping(true);
+                        ring.start();
+
+                        long[] pattern = {0, 100, 1000};
+                        vibrator.vibrate(pattern, 0);
                         stateAlarma = false;
-                        resetAlarma();
+                        //getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+                        //resetAlarma();
 
                        /* new AlertDialog.Builder(MainActivity.this)
                                 .setTitle("Alarma")
@@ -80,7 +106,59 @@ public class MainActivity extends AppCompatActivity {
         });*/
 
     }
+/*
+    @Override
+    protected void onPause() {
+        // when the screen is about to turn off
+        if (ScreenReceiver.wasScreenOn) {
+            // this is the case when onPause() is called by the system due to a screen state change
+            System.out.println("SCREEN TURNED OFF");
 
+        } else {
+            // this is when onPause() is called when the screen state has not changed
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        // only when screen turns on
+        if (!ScreenReceiver.wasScreenOn) {
+            // this is when onResume() is called due to a screen state change
+            System.out.println("SCREEN TURNED ON");
+        } else {
+            // this is when onResume() is called when the screen state has not changed
+        }
+        super.onResume();
+    }
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_POWER) {
+            Log.i("", "Dispath event power");
+            Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+            sendBroadcast(closeDialog);
+            return true;
+        }
+
+        return super.dispatchKeyEvent(event);
+    }*/
+public boolean dispatchKeyEvent(KeyEvent event) {
+    if (event.getKeyCode() == KeyEvent.KEYCODE_POWER) {
+        Log.i("", "Dispath event power");
+        Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        sendBroadcast(closeDialog);
+        return true;
+    }
+
+    return super.dispatchKeyEvent(event);
+}
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        //if (keyCode == KeyEvent.KEYCODE_BACK) {
+         //   return true;
+        //}
+        //return super.onKeyDown(keyCode, event);
+        Log.d("Test",keyCode+"");
+        return true;
+    }
     public void setTime (View v){
         /*new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Dialog Simple")
@@ -108,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean comparetDate(String timeAlarm){
 
         RadioGroup radioGroup = this.findViewById(R.id.myRadioGroup);
-        int selectDay = radioGroup.getCheckedRadioButtonId()+1;
+        int selectDay = radioGroup.getCheckedRadioButtonId();
+        ++selectDay;
         Log.d("Test","Day select "+selectDay);
 
         Calendar calendar = Calendar.getInstance();
