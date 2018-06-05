@@ -3,6 +3,7 @@ package com.alarm.john.alarm;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.PixelFormat;
 import android.icu.text.DateFormat;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.support.v4.app.DialogFragment;
@@ -21,10 +23,15 @@ import android.widget.RadioButton;
 import 	android.os.SystemClock;
 import android.util.Log;
 import	java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
 import android.os.Vibrator;
 import android.content.Context;
+import android.os.PowerManager;
 
 import android.net.Uri;
 public class MainActivity extends AppCompatActivity {
@@ -33,23 +40,40 @@ public class MainActivity extends AppCompatActivity {
     public String  hours   = "00";
     public String  minutes = "00";
     public int     day     = 0;
-    public MainActivity el = this;
+    protected PowerManager.WakeLock mWakeLock;
+
 
     private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+
         setContentView(R.layout.activity_main);
 
+        PrefUtils.setKioskModeActive(true, getApplicationContext());
 
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
-        BroadcastReceiver mReceiver = new ReceiverScreen();
-        registerReceiver(mReceiver, filter);
+        WindowManager manager = ((WindowManager) getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE));
+        WindowManager.LayoutParams localLayoutParams = new WindowManager.LayoutParams();
+        localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
+        localLayoutParams.gravity = Gravity.TOP;
+        localLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|
+                // this is to enable the notification to recieve touch events
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                // Draws over status bar
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+        localLayoutParams.height = (int) (50 * getResources()
+                .getDisplayMetrics().scaledDensity);
+        localLayoutParams.format = PixelFormat.TRANSPARENT;
+        customViewGroup view = new customViewGroup(this);
+        manager.addView(view, localLayoutParams);
+
+
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
         new Thread(new Runnable(){
             public void run() {
                 // do something here
@@ -93,72 +117,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
 
-        /*RadioGroup radioGroup = this.findViewById(R.id.State);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-        {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // checkedId is the RadioButton selected
-                RadioButton rb=(RadioButton)findViewById(checkedId);
-                //textViewChoice.setText("You Selected " + rb.getText());
-                //Toast.makeText(getApplicationContext(), rb.getText(), Toast.LENGTH_SHORT).show();
-                Log.d("Test",rb.getText()+"");
-            }
-        });*/
 
     }
-/*
     @Override
-    protected void onPause() {
-        // when the screen is about to turn off
-        if (ScreenReceiver.wasScreenOn) {
-            // this is the case when onPause() is called by the system due to a screen state change
-            System.out.println("SCREEN TURNED OFF");
-
-        } else {
-            // this is when onPause() is called when the screen state has not changed
-        }
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        // only when screen turns on
-        if (!ScreenReceiver.wasScreenOn) {
-            // this is when onResume() is called due to a screen state change
-            System.out.println("SCREEN TURNED ON");
-        } else {
-            // this is when onResume() is called when the screen state has not changed
-        }
-        super.onResume();
-    }
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_POWER) {
-            Log.i("", "Dispath event power");
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(!hasFocus) {
+            // Close every kind of system dialog
             Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
             sendBroadcast(closeDialog);
-            return true;
         }
-
-        return super.dispatchKeyEvent(event);
-    }*/
-public boolean dispatchKeyEvent(KeyEvent event) {
-    if (event.getKeyCode() == KeyEvent.KEYCODE_POWER) {
-        Log.i("", "Dispath event power");
-        Intent closeDialog = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        sendBroadcast(closeDialog);
-        return true;
     }
 
-    return super.dispatchKeyEvent(event);
-}
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        //if (keyCode == KeyEvent.KEYCODE_BACK) {
-         //   return true;
-        //}
-        //return super.onKeyDown(keyCode, event);
-        Log.d("Test",keyCode+"");
-        return true;
+    private final List blockedKeys = new ArrayList(Arrays.asList(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP));
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (blockedKeys.contains(event.getKeyCode())) {
+            return true;
+        } else {
+            return super.dispatchKeyEvent(event);
+        }
     }
+
+    @Override
+    public void onAttachedToWindow() {
+        //this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+        super.onAttachedToWindow();
+    }
+
     public void setTime (View v){
         /*new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Dialog Simple")
@@ -217,6 +203,11 @@ public boolean dispatchKeyEvent(KeyEvent event) {
         TextView stateText =this.findViewById(R.id.State);
         stateText.setText("INACTIVO");
         stateAlarma = false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        // nothing to do here
     }
 
 }
