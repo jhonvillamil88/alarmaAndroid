@@ -1,4 +1,4 @@
-package com.alarm.john.alarm;
+package com.alarm.john.alarm.kioskMode;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

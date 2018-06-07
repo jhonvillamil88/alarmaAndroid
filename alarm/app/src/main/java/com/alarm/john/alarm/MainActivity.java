@@ -1,16 +1,9 @@
 package com.alarm.john.alarm;
 
-import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.PixelFormat;
-import android.icu.text.DateFormat;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -19,31 +12,28 @@ import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.RadioGroup;
-import android.widget.RadioButton;
-import 	android.os.SystemClock;
 import android.util.Log;
 import	java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import android.os.Vibrator;
 import android.content.Context;
 import android.os.PowerManager;
 
-import android.net.Uri;
+import com.alarm.john.alarm.kioskMode.PrefUtils;
+import com.alarm.john.alarm.kioskMode.customViewGroup;
+import com.alarm.john.alarm.service.Monitor;
+
 public class MainActivity extends AppCompatActivity {
 
-    public boolean stateAlarma = false;
-    public String  hours   = "00";
-    public String  minutes = "00";
-    public int     day     = 0;
+
     protected PowerManager.WakeLock mWakeLock;
 
 
-    private Vibrator vibrator;
+    Intent serviceIntent;
+    public boolean stateAlarma = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        PrefUtils.setKioskModeActive(true, getApplicationContext());
+        //Desactivo el kiosk mode al iniciar
+        PrefUtils.setKioskModeActive(false, getApplicationContext());
 
-        WindowManager manager = ((WindowManager) getApplicationContext()
+
+        startService(new Intent(this, Monitor.class));
+
+        /*WindowManager manager = ((WindowManager) getApplicationContext()
                 .getSystemService(Context.WINDOW_SERVICE));
         WindowManager.LayoutParams localLayoutParams = new WindowManager.LayoutParams();
         localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
@@ -69,54 +63,17 @@ public class MainActivity extends AppCompatActivity {
                 .getDisplayMetrics().scaledDensity);
         localLayoutParams.format = PixelFormat.TRANSPARENT;
         customViewGroup view = new customViewGroup(this);
-        manager.addView(view, localLayoutParams);
-
-
-        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-        new Thread(new Runnable(){
-            public void run() {
-                // do something here
-                while(true){
-                    SystemClock.sleep(1000);
-                    if(!stateAlarma)continue;
-                    Log.d("run", "running alarm");
-
-                    hours = TimePickerFragment.getHour()+"";
-                    minutes = TimePickerFragment.getMinute()+"";
-
-                    if(comparetDate(hours+":"+minutes)){
-                        Log.d("run","Se cumplio el alarma");
-
-                        Log.v("", "Initializing sounds...");
+        manager.addView(view, localLayoutParams);*/
 
 
 
-                        MediaPlayer ring= MediaPlayer.create(MainActivity.this,R.raw.alarma);
-                        ring.setLooping(true);
-                        ring.start();
-
-                        long[] pattern = {0, 100, 1000};
-                        vibrator.vibrate(pattern, 0);
-                        stateAlarma = false;
-                        //getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
-                        //resetAlarma();
-
-                       /* new AlertDialog.Builder(MainActivity.this)
-                                .setTitle("Alarma")
-                                .setMessage("Holaaa mi amor es hora de levantarte")
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-
-                                        dialog.cancel();
-                                    }
-                                }).show();*/
-
-                    }
-                }
+        /*RadioGroup rb = (RadioGroup) findViewById(R.id.myRadioGroup);
+        rb.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                Monitor.day = checkedId;
             }
-        }).start();
 
+        });*/
 
     }
     @Override
@@ -129,13 +86,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private final List blockedKeys = new ArrayList(Arrays.asList(KeyEvent.KEYCODE_VOLUME_DOWN, KeyEvent.KEYCODE_VOLUME_UP));
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (blockedKeys.contains(event.getKeyCode())) {
-            return true;
-        } else {
+        // nothing to do here
+        if (!PrefUtils.isKioskModeActive(getApplicationContext())) {
             return super.dispatchKeyEvent(event);
+        } else {
+            return true;
         }
     }
 
@@ -146,15 +103,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setTime (View v){
-        /*new AlertDialog.Builder(MainActivity.this)
-                .setTitle("Dialog Simple")
-                .setMessage("Gracias por visitar javaheros.blogspot.com")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
 
-                        dialog.cancel();
-                    }
-                }).show();*/
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
@@ -169,45 +118,18 @@ public class MainActivity extends AppCompatActivity {
         testButton.setText((stateAlarma)?"DESACTIVAR":"ACTIVAR");
     }
 
-    public boolean comparetDate(String timeAlarm){
-
-        RadioGroup radioGroup = this.findViewById(R.id.myRadioGroup);
-        int selectDay = radioGroup.getCheckedRadioButtonId();
-        ++selectDay;
-        Log.d("Test","Day select "+selectDay);
-
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_WEEK);
-        Log.d("Day",day+"");
-        if(selectDay!=day)return false;
-
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
-        String currentDateandTime = format.format(new Date());
-        try{
-            Date dateAlarm = format.parse(timeAlarm);
-            Date dateSystem = format.parse(currentDateandTime);
-            if (dateSystem.getTime() > dateAlarm.getTime()) {
-                return true;
-            }
-        }catch(Exception e ){
-
+    public void onClickDay(View v) {
+        final int id = v.getId();
+        switch (id) {
+            case R.id.day1:
+                // your code for button1 here
+                Log.d("Test","Lunes");
+                break;
+            case R.id.day2:
+                // your code for button2 here
+                Log.d("Test","Martes");
+                break;
+            // even more buttons here
         }
-        return false;
     }
-
-    public void setDay(View v){
-        Log.d("Test",v.toString());
-    }
-
-    public void resetAlarma(){
-        TextView stateText =this.findViewById(R.id.State);
-        stateText.setText("INACTIVO");
-        stateAlarma = false;
-    }
-
-    @Override
-    public void onBackPressed() {
-        // nothing to do here
-    }
-
 }

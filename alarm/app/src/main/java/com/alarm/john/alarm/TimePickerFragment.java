@@ -8,6 +8,8 @@ import android.text.format.DateFormat;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.alarm.john.alarm.service.Monitor;
+
 import java.util.Calendar;
 
 
@@ -31,9 +33,11 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // Do something with the time chosen by the user
         TextView tv1=(TextView) getActivity().findViewById(R.id.Time);
-        tv1.setText(view.getHour()+":"+view.getMinute());
-        this.setHour(view.getHour());
-        this.setMinute(view.getMinute());
+        tv1.setText(view.getCurrentHour()+":"+view.getCurrentMinute());
+        //this.setHour(view.getCurrentHour());
+        //this.setMinute(view.getCurrentMinute());
+        Monitor.hours = view.getCurrentHour()+"";
+        Monitor.minutes = view.getCurrentMinute()+"";
 
     }
 

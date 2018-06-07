@@ -1,8 +1,10 @@
-package com.alarm.john.alarm;
+package com.alarm.john.alarm.kioskMode;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+
+import com.alarm.john.alarm.MainActivity;
 
 public class BootReceiver extends BroadcastReceiver {
 

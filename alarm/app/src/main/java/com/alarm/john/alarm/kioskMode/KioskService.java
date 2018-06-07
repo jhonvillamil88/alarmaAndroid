@@ -1,4 +1,4 @@
-package com.alarm.john.alarm;
+package com.alarm.john.alarm.kioskMode;
 
 import android.app.ActivityManager;
 import android.app.Service;
@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.alarm.john.alarm.MainActivity;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +20,7 @@ public class KioskService extends Service {
 
     private Thread t = null;
     private Context ctx = null;
-    private boolean running = false;
+    public static boolean running = false;
 
     @Override
     public void onDestroy() {
