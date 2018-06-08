@@ -3,6 +3,7 @@ package com.alarm.john.alarm.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -65,10 +66,18 @@ public class Monitor extends Service {
         return null;
     }
     private Boolean comparedDate(){
-        Calendar calendar = Calendar.getInstance();
+        /*Calendar calendar = Calendar.getInstance();
         int dayCurrent = calendar.get(Calendar.DAY_OF_WEEK);
         Log.d("Day",dayCurrent+"");
-        if(day!=dayCurrent)return false;
+        if(day!=dayCurrent)return false;*/
+        Calendar calendar = Calendar.getInstance();
+        int dayCurrent = calendar.get(Calendar.DAY_OF_WEEK);
+        Log.d("DaySistem",dayCurrent+" - "+calendar.getTimeInMillis());
+        SharedPreferences prefsT =   getSharedPreferences("preferences",Context.MODE_PRIVATE);
+
+        boolean isDayValid = prefsT.getBoolean("day"+dayCurrent, false);
+
+        if(!isDayValid)return false;
 
         SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         String currentDateandTime = format.format(new Date());

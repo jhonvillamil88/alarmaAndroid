@@ -1,6 +1,7 @@
 package com.alarm.john.alarm;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.support.v4.app.DialogFragment;
 import android.view.WindowManager;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.RadioGroup;
@@ -120,16 +122,55 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickDay(View v) {
         final int id = v.getId();
+        CheckBox action = (CheckBox)this.findViewById(id);
+        boolean state = action.isChecked();
+        int day = -1;
+
         switch (id) {
             case R.id.day1:
                 // your code for button1 here
                 Log.d("Test","Lunes");
+                day = 0;
                 break;
             case R.id.day2:
                 // your code for button2 here
                 Log.d("Test","Martes");
+                day = 1;
+                break;
+            case R.id.day3:
+                // your code for button2 here
+                Log.d("Test","Miercoles");
+                day = 2;
+                break;
+            case R.id.day4:
+                // your code for button2 here
+                Log.d("Test","Jueves");
+                day = 3;
+                break;
+            case R.id.day5:
+                // your code for button2 here
+                Log.d("Test","Viernes");
+                day = 4;
+                break;
+            case R.id.day6:
+                // your code for button2 here
+                Log.d("Test","Sabado");
+                day = 5;
+                break;
+            case R.id.day7:
+                // your code for button2 here
+                Log.d("Test","Domingo");
+                day = 6;
                 break;
             // even more buttons here
         }
+
+        SharedPreferences prefs =
+                getSharedPreferences("preferences",Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("day"+day, state);
+        editor.commit();
+        Log.d("Preferences","Saved DAY OK");
     }
 }
