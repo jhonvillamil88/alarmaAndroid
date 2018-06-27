@@ -11,7 +11,7 @@
         android:id="@+id/Text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Seleccione el dia"
+        android:text="Seleccione los dias"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.104"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -78,97 +78,97 @@
         app:layout_constraintVertical_bias="0.917"
         />
 
-    <CheckBox
-        android:id="@+id/day1"
-        android:layout_width="89dp"
-        android:layout_height="32dp"
-        android:layout_marginLeft="28dp"
-        android:layout_marginTop="16dp"
-        android:text="Lunes"
-        android:onClick="onClickDay"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.183" />
 
     <CheckBox
         android:id="@+id/day2"
-        android:layout_width="93dp"
-        android:layout_height="32dp"
-        android:layout_marginLeft="28dp"
-        android:layout_marginTop="10dp"
-        android:text="Martes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
         android:onClick="onClickDay"
+        android:text="Lunes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.26" />
+        app:layout_constraintVertical_bias="0.20" />
 
     <CheckBox
         android:id="@+id/day3"
         android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:layout_marginLeft="28dp"
-        android:layout_marginTop="10dp"
-        android:text="Miercoles"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
         android:onClick="onClickDay"
+        android:text="Martes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.321" />
+        app:layout_constraintVertical_bias="0.27" />
 
     <CheckBox
         android:id="@+id/day4"
-        android:layout_width="91dp"
-        android:layout_height="32dp"
-        android:layout_marginLeft="28dp"
-        android:text="Jueves"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
         android:onClick="onClickDay"
+        android:text="Miercoles"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.402" />
+        app:layout_constraintVertical_bias="0.34" />
 
     <CheckBox
         android:id="@+id/day5"
-        android:layout_width="90dp"
-        android:layout_height="32dp"
-        android:layout_marginLeft="28dp"
-        android:text="Viernes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
         android:onClick="onClickDay"
+        android:text="Jueves"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.469" />
+        app:layout_constraintVertical_bias="0.41" />
 
     <CheckBox
         android:id="@+id/day6"
-        android:layout_width="107dp"
-        android:layout_height="32dp"
-        android:layout_marginLeft="28dp"
-        android:text="Sabado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
         android:onClick="onClickDay"
+        android:text="Viernes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.537" />
+        app:layout_constraintVertical_bias="0.48"/>
 
     <CheckBox
         android:id="@+id/day7"
         android:layout_width="wrap_content"
-        android:layout_height="32dp"
-        android:layout_marginBottom="42dp"
-        android:layout_marginLeft="28dp"
-        android:text="Domingo"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="16dp"
         android:onClick="onClickDay"
+        android:text="Sabado"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.661" />
+        app:layout_constraintVertical_bias="0.55" />
 
-
-
-
+    <CheckBox
+        android:id="@+id/day1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:layout_marginLeft="32dp"
+        android:onClick="onClickDay"
+        android:text="Domingo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.65" />
 
 
 
