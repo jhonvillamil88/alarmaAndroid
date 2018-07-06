@@ -1,6 +1,20 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        alarm {
+            keyAlias 'key0'
+            keyPassword 'villamil$$2017'
+            storeFile file('/home/john/alarm')
+            storePassword 'villamil$$2017'
+        }
+        alarm1 {
+            keyAlias 'alarm1'
+            keyPassword 'villamil$$2017'
+            storeFile file('/home/john/alarm1')
+            storePassword 'villamil$$2017'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.alarm.john.alarm"
@@ -15,6 +29,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.alarm
+        }
+        debug {
+            signingConfig signingConfigs.alarm
         }
     }
     productFlavors {
@@ -28,5 +46,4 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
 }

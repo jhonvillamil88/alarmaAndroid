@@ -179,7 +179,11 @@ public  class MainActivity extends AppCompatActivity {
 
     public void setState (View v){
 
-  
+
+        if(!isOneDaySelected()){
+            Toast.makeText(this, "Debe de seleccionar un dia", Toast.LENGTH_LONG).show();
+            return;
+        }
         stateAlarma = !stateAlarma;
        // TextView stateText =this.findViewById(R.id.State);
         //stateText.setText((stateAlarma)?"ACTIVO":"INACTIVO");
@@ -214,7 +218,7 @@ public  class MainActivity extends AppCompatActivity {
 
 
         if(!validateTime(nextAlarma)){
-            Log.i("VAlidate","Pasoooo");
+            Log.i("Validate","Pasoooo");
             nextAlarma = dateAlarma + makeTimeNextAlarm();
         }
         scheduleAlarm(context,nextAlarma);
@@ -235,6 +239,15 @@ public  class MainActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    public  boolean isOneDaySelected(){
+        for( int i = 1; i < 8; i++ ){
+            if( prefs.getBoolean("day"+i, false) ){
+                return true;
+            }
+        }
+        return false;
     }
     public static long makeTimeNextAlarm(){
 
@@ -313,11 +326,19 @@ public  class MainActivity extends AppCompatActivity {
         editor.commit();
         Log.d("Preferences","Saved DAY OK");
 
-        TextView textNextAlarm =this.findViewById(R.id.textNextAlarma);
-        scheduleNextAlarm(getApplicationContext());
-        textNextAlarm.setText("Proxima alarma: "+textFormatNaturalNextAlarma);
-
-
+        if(stateAlarma){
+            if(!isOneDaySelected()){
+                textNextAlarm.setText("Proxima alarma: -- ");
+                cancelAlarm();
+                Button testButton = (Button) findViewById(R.id.setState);
+                testButton.setText("ACTIVAR");
+                stateAlarma = false;
+            }else{
+                TextView textNextAlarm =this.findViewById(R.id.textNextAlarma);
+                scheduleNextAlarm(getApplicationContext());
+                textNextAlarm.setText("Proxima alarma: "+textFormatNaturalNextAlarma);
+            }
+        }
     }
 
     /*
