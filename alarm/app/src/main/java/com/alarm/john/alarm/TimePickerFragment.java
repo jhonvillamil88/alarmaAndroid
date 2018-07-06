@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -17,6 +18,7 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
 
     public static int hour   = 0;
     public static int minute = 0;
+
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -33,15 +35,23 @@ public class TimePickerFragment extends DialogFragment implements TimePickerDial
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // Do something with the time chosen by the user
         TextView tv1=(TextView) getActivity().findViewById(R.id.Time);
-        tv1.setText(view.getCurrentHour()+":"+view.getCurrentMinute());
+        String finalHour = (((view.getCurrentHour()+"").length()==1)?"0":"")+view.getCurrentHour();
+        String finalMinute = (((view.getCurrentMinute()+"").length()==1)?"0":"")+view.getCurrentMinute();
+
+        tv1.setText(finalHour+":"+finalMinute);
 
         SharedPreferences prefsT =   getActivity().getSharedPreferences("preferences", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefsT.edit();
-        editor.putString("time", view.getCurrentHour()+":"+view.getCurrentMinute());
+
+        editor.putString("time", finalHour+":"+finalMinute);
         editor.commit();
+        if(MainActivity.stateAlarma){
+            MainActivity.scheduleNextAlarm(getContext());
+            TextView textNextAlarma =(TextView) getActivity().findViewById(R.id.textNextAlarma);
+            textNextAlarma.setText("Proxima alarma: "+MainActivity.textFormatNaturalNextAlarma);
+        }
 
     }
-
     private void setHour(int _hour) {
         this.hour = _hour;
     }

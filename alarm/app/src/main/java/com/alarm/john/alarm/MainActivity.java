@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity {
+public  class MainActivity extends AppCompatActivity {
 
 
     protected PowerManager.WakeLock mWakeLock;
@@ -45,15 +46,19 @@ public class MainActivity extends AppCompatActivity {
     public static boolean stateAlarma = false;
     public static boolean alarmaIsActive = false;
     LoadPreferences Load = new LoadPreferences();
-    private Vibrator vibrator;
-    private MediaPlayer ring;
-    SharedPreferences prefs;
-
+    public static Vibrator vibrator;
+    public static MediaPlayer ring;
+    public static SharedPreferences prefs;
+    public static SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    public static SimpleDateFormat naturalFormat = new SimpleDateFormat("EEEE, 28 MMMM yyyy HH:mm");
+    public static String textFormatNaturalNextAlarma = " -- ";
+    public TextView textNextAlarm;
 
     /*static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }*/
-
+    private int streamType = AudioManager.STREAM_MUSIC;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
         LoadPreferences.start(getApplicationContext(),this);
         prefs =   getSharedPreferences("preferences",Context.MODE_PRIVATE);
+        textNextAlarm = this.findViewById(R.id.textNextAlarma);
 
 
         Bundle extras = this.getIntent().getExtras();
@@ -71,36 +77,42 @@ public class MainActivity extends AppCompatActivity {
         if(extras != null) {
             if(extras.getBoolean("alarm")){
                 activeAlarm();
+                setContentView(R.layout.activity_alarm);
             }
         }
     }
-    public  void scheduleAlarm(String hour){
+    public TextView getTextView(){
 
-            Log.i("Test","Service");
-
-            Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String dateNow = sdf.format(calendar.getTime());
-
-            Log.i("alarma",dateNow+" "+hour);
-
-            Long time = milliseconds(dateNow+" "+hour);
-
-            Intent intentAlarm = new Intent(this, AlarmReceiver.class);
-
-            // create the object
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-            //set the alarm for particular time
-            alarmManager.set(AlarmManager.RTC_WAKEUP,time, PendingIntent.getBroadcast(this,1,  intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
-
+        TextView txtView = (TextView)findViewById(R.id.textNextAlarma);
+        return txtView;
     }
 
-    public long milliseconds(String date){
+    public void setTextNextAlarm(Context context){
+        TextView textNextAlarm =this.findViewById(R.id.textNextAlarma);
+        textNextAlarm.setText("Hola");
+    }
+    public static void scheduleAlarm(Context context,long nextAlarm){
+            Intent intentAlarm = new Intent(context, AlarmReceiver.class);
+            // create the object
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            //set the alarm for particular time
+            alarmManager.set(AlarmManager.RTC_WAKEUP,nextAlarm, PendingIntent.getBroadcast(context,1,  intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT));
+    }
+
+    public void cancelAlarm(){
+        Intent intentAlarm = new Intent(this, AlarmReceiver.class);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pi = PendingIntent.getBroadcast(this, 1, intentAlarm, 0);
+        alarmManager.cancel(pi);
+        Toast.makeText(this, "Alarma DESACTIVADA", Toast.LENGTH_LONG).show();
+    }
+
+    public static long milliseconds(String date){
         //String date_ = date;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         try{
-            Date mDate = sdf.parse(date);
+            Date mDate = timestampFormat.parse(date);
+            Log.i("Alarm date",date);
             long timeInMilliseconds = mDate.getTime();
             return timeInMilliseconds;
         }
@@ -111,11 +123,9 @@ public class MainActivity extends AppCompatActivity {
 
         return 0;
     }
-
+     private PowerManager mPowerManager;
 
     public void activeAlarm(){
-
-
         ring = MediaPlayer.create(this,R.raw.alarma);
         ring.setLooping(true);
         ring.start();
@@ -127,33 +137,39 @@ public class MainActivity extends AppCompatActivity {
         PrefUtils.setKioskModeActive(true, getApplicationContext());
 
         alarmaIsActive = true;
-        showAddItemDialog(MainActivity.this);
+        //showAddItemDialog(MainActivity.this);
+
+        getWindow().addFlags( WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON );
+        AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
+
+
+  //later
     }
     public void desactivedAlarma(){
         Log.i("Termino","Se cancela el alarma");
         PrefUtils.setKioskModeActive(false, getApplicationContext());
         ring.stop();
         vibrator.cancel();
+        alarmaIsActive = false;
+        TextView textNextAlarm =this.findViewById(R.id.textNextAlarma);
+        scheduleNextAlarm(getApplicationContext());
+        textNextAlarm.setText("Proxima alarma: "+textFormatNaturalNextAlarma);
+        setContentView(R.layout.activity_main);
+
     }
 
-    private void showAddItemDialog(Context c) {
-        final EditText taskEditText = new EditText(c);
-        AlertDialog dialog = new AlertDialog.Builder(c)
-                .setTitle("Responde para cancelar el alarma")
-                .setMessage("¿Lana sube lana baja?")
-                .setView(taskEditText)
-                .setPositiveButton("Responder", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String task = String.valueOf(taskEditText.getText());
-                        Log.i("Test",task);
-                        if( task.equals("la navaja")){
-                            desactivedAlarma();
-                        }
-                    }
-                })
-                .create();
-        dialog.show();
+
+    public void response(View v){
+        TextView response = this.findViewById(R.id.response);
+        if( String.valueOf(response.getText()).equals("la navaja") ){
+            desactivedAlarma();
+
+        }
     }
     public void setTime (View v){
 
@@ -163,13 +179,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void setState (View v){
 
-        if(alarmaIsActive){
-            showAddItemDialog(MainActivity.this);
-            return;
-        }
+  
         stateAlarma = !stateAlarma;
-        TextView stateText =this.findViewById(R.id.State);
-        stateText.setText((stateAlarma)?"ACTIVO":"INACTIVO");
+       // TextView stateText =this.findViewById(R.id.State);
+        //stateText.setText((stateAlarma)?"ACTIVO":"INACTIVO");
 
         Button testButton = (Button) findViewById(R.id.setState);
         testButton.setText((stateAlarma)?"DESACTIVAR":"ACTIVAR");
@@ -179,15 +192,75 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean("state", stateAlarma);
         editor.commit();
 
-
+        TextView textNextAlarm =this.findViewById(R.id.textNextAlarma);
         if(stateAlarma){
-            String timeAlarm = prefs.getString("time", "00:00");
-            scheduleAlarm(timeAlarm);
-        }
+            scheduleNextAlarm(getApplicationContext());
+            textNextAlarm.setText("Proxima alarma: "+textFormatNaturalNextAlarma);
 
-        Toast.makeText(this, "El alarma fue "+((stateAlarma)?"Activada":"Desactivada"), Toast.LENGTH_LONG).show();
+        }else{
+            cancelAlarm();
+            textNextAlarm.setText("Proxima alarma: -- ");
+
+        }
     }
 
+    public static void scheduleNextAlarm(Context context){
+        String timeAlarm = prefs.getString("time", "00:00");
+        Date dateCurrent = new Date();
+        String dateCurrentFormat = dateFormat.format(dateCurrent);
+        long dateAlarma = milliseconds(dateCurrentFormat+" "+timeAlarm+":00");
+        long millisStart = Calendar.getInstance().getTimeInMillis();
+        long nextAlarma = dateAlarma;
+
+
+        if(!validateTime(nextAlarma)){
+            Log.i("VAlidate","Pasoooo");
+            nextAlarma = dateAlarma + makeTimeNextAlarm();
+        }
+        scheduleAlarm(context,nextAlarma);
+        Log.i("Next Alarm",timeToString(nextAlarma));
+        textFormatNaturalNextAlarma = timeToString(nextAlarma);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("textNextAlarm", textFormatNaturalNextAlarma);
+        editor.commit();
+        Toast.makeText(context, "Su alarma sonara el proximo "+textFormatNaturalNextAlarma, Toast.LENGTH_LONG).show();
+
+
+
+    }
+    public static Boolean validateTime(long dateAlarma){
+        long millisStart = Calendar.getInstance().getTimeInMillis();
+        if( dateAlarma <= millisStart ){
+            //return dateAlarma + (1000 * 60 * 60 * 24);
+            return false;
+        }
+        return true;
+    }
+    public static long makeTimeNextAlarm(){
+
+        Calendar c = Calendar.getInstance();
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK) + 1;
+        Log.i("Day week",dayOfWeek+"");
+        Boolean dayAlarma = false;
+        Boolean fl = true;
+        int factorMulti = 1;
+        do{
+            dayAlarma = prefs.getBoolean("day"+dayOfWeek, false);
+            Log.i("TAG","day"+dayOfWeek);
+            if(!dayAlarma){
+                ++factorMulti;
+                ++dayOfWeek;
+                if(dayOfWeek==8)
+                    dayOfWeek=1;
+            }
+        }while(!dayAlarma);
+        return (1000 * 60 * 60 * 24) * factorMulti;
+
+    }
+    public static String timeToString(long millis){
+        Date date = new Date(millis);
+        return naturalFormat.format(date);
+    }
     public void onClickDay(View v) {
         final int id = v.getId();
         CheckBox action = (CheckBox)this.findViewById(id);
@@ -239,6 +312,12 @@ public class MainActivity extends AppCompatActivity {
         editor.putBoolean("day"+day, state);
         editor.commit();
         Log.d("Preferences","Saved DAY OK");
+
+        TextView textNextAlarm =this.findViewById(R.id.textNextAlarma);
+        scheduleNextAlarm(getApplicationContext());
+        textNextAlarm.setText("Proxima alarma: "+textFormatNaturalNextAlarma);
+
+
     }
 
     /*

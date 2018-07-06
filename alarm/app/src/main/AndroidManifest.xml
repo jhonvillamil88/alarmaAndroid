@@ -23,6 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.alarm.john.alarm.AlarmActivity">
+
+        </activity>
        <!-- <receiver android:name="com.alarm.john.alarm.kioskMode.BootReceiver">
             <intent-filter >
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>

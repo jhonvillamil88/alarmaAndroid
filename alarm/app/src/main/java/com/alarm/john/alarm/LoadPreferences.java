@@ -15,8 +15,8 @@ public class LoadPreferences {
         boolean isAlarmaActivate = prefsT.getBoolean("state", false);
 
         //boton de activar o desactivar alarma
-        TextView stateText = el.findViewById(R.id.State);
-        stateText.setText((isAlarmaActivate)?"ACTIVO":"INACTIVO");
+        //TextView stateText = el.findViewById(R.id.State);
+        //stateText.setText((isAlarmaActivate)?"ACTIVO":"INACTIVO");
         MainActivity.stateAlarma = isAlarmaActivate;
         Button testButton = (Button) el.findViewById(R.id.setState);
         testButton.setText((isAlarmaActivate)?"DESACTIVAR":"ACTIVAR");
@@ -36,6 +36,14 @@ public class LoadPreferences {
         TextView timeText = el.findViewById(R.id.Time);
         String isTime = prefsT.getString("time", "00:00");
         timeText.setText(isTime);
+
+
+        if(MainActivity.stateAlarma){
+            TextView textNextAlarm = el.findViewById(R.id.textNextAlarma);
+            String netxAlarm = prefsT.getString("textNextAlarm", " -- ");
+            textNextAlarm.setText("Proxima alarma: "+netxAlarm);
+        }
+
 
 
     }
