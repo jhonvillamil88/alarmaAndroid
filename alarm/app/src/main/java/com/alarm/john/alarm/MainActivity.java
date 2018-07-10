@@ -51,7 +51,7 @@ public  class MainActivity extends AppCompatActivity {
     public static SharedPreferences prefs;
     public static SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-    public static SimpleDateFormat naturalFormat = new SimpleDateFormat("EEEE, 28 MMMM yyyy HH:mm");
+    public static SimpleDateFormat naturalFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy HH:mm");
     public static String textFormatNaturalNextAlarma = " -- ";
     public TextView textNextAlarm;
 

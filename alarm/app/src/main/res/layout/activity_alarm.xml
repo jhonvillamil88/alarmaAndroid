@@ -23,17 +23,18 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
         android:text="¿Lana subre lana baja?"
         android:textSize="24sp"
-        tools:layout_editor_absoluteX="73dp"
+        app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="183dp" />
 
     <EditText
         android:id="@+id/response"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="92dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="44dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:text=""
@@ -42,12 +43,15 @@
 
     <Button
         android:id="@+id/reponseButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp"
+        android:gravity="center"
+        android:layout_alignParentBottom="true"
+        android:onClick="response"
         android:text="Responder"
         app:layout_constraintTop_toBottomOf="@+id/response"
-        tools:layout_editor_absoluteX="149dp"
-        android:onClick="response"/>
+        tools:layout_editor_absoluteX="140dp" />
 
 </android.support.constraint.ConstraintLayout>
