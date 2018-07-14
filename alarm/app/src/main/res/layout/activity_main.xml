@@ -68,7 +68,7 @@
 
 
     <CheckBox
-        android:id="@+id/day2"
+        android:id="@+id/day1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
@@ -81,7 +81,7 @@
         app:layout_constraintVertical_bias="0.20" />
 
     <CheckBox
-        android:id="@+id/day3"
+        android:id="@+id/day2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
@@ -94,7 +94,7 @@
         app:layout_constraintVertical_bias="0.27" />
 
     <CheckBox
-        android:id="@+id/day4"
+        android:id="@+id/day3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
@@ -107,7 +107,7 @@
         app:layout_constraintVertical_bias="0.34" />
 
     <CheckBox
-        android:id="@+id/day5"
+        android:id="@+id/day4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
@@ -120,7 +120,7 @@
         app:layout_constraintVertical_bias="0.41" />
 
     <CheckBox
-        android:id="@+id/day6"
+        android:id="@+id/day5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
@@ -133,7 +133,7 @@
         app:layout_constraintVertical_bias="0.48"/>
 
     <CheckBox
-        android:id="@+id/day7"
+        android:id="@+id/day6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"
@@ -146,7 +146,7 @@
         app:layout_constraintVertical_bias="0.55" />
 
     <CheckBox
-        android:id="@+id/day1"
+        android:id="@+id/day7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp"

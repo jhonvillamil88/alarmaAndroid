@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.SystemClock;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -158,8 +159,13 @@ public  class MainActivity extends AppCompatActivity {
         alarmaIsActive = false;
         TextView textNextAlarm =this.findViewById(R.id.textNextAlarma);
         scheduleNextAlarm(getApplicationContext());
-        textNextAlarm.setText("Proxima alarma: "+textFormatNaturalNextAlarma);
-        setContentView(R.layout.activity_main);
+        //textNextAlarm.setText("Proxima alarma: "+textFormatNaturalNextAlarma);
+        //setContentView(R.layout.activity_main);
+        //Toast.makeText(this, "Proxima alarma: "+textFormatNaturalNextAlarma, Toast.LENGTH_LONG).show();
+
+        moveTaskToBack(true);
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(1);
 
     }
 
@@ -179,7 +185,15 @@ public  class MainActivity extends AppCompatActivity {
 
     public void setState (View v){
 
+        Log.i("TEST1","Paso por aqui");
 
+        Date dt = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(dt);
+        c.add(Calendar.DATE, 1);
+        dt = c.getTime();
+
+        Log.i("TAG1",c.toString());
         if(!isOneDaySelected()){
             Toast.makeText(this, "Debe de seleccionar un dia", Toast.LENGTH_LONG).show();
             return;
@@ -252,20 +266,28 @@ public  class MainActivity extends AppCompatActivity {
     public static long makeTimeNextAlarm(){
 
         Calendar c = Calendar.getInstance();
-        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK) + 1;
+        Log.i("TAG","Date "+c.toString());
+        int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
         Log.i("Day week",dayOfWeek+"");
         Boolean dayAlarma = false;
         Boolean fl = true;
         int factorMulti = 1;
+        int self = 0;
         do{
             dayAlarma = prefs.getBoolean("day"+dayOfWeek, false);
             Log.i("TAG","day"+dayOfWeek);
             if(!dayAlarma){
                 ++factorMulti;
                 ++dayOfWeek;
-                if(dayOfWeek==8)
+                if(dayOfWeek>7)
                     dayOfWeek=1;
             }
+
+            if( self > 7 ){
+                dayAlarma = true;
+                Log.i("TSG","Termino mal");
+            }
+            ++self;
         }while(!dayAlarma);
         return (1000 * 60 * 60 * 24) * factorMulti;
 
